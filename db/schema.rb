@@ -10,9 +10,43 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_10_103214) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_203324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.bigint "location_id"
+    t.bigint "user_id"
+    t.string "city"
+    t.string "postal_code"
+    t.string "postal_city"
+    t.string "street"
+    t.string "building"
+    t.string "apartment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_addresses_on_location_id"
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.string "region_name"
+    t.string "longitude"
+    t.string "latitude"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.bigint "vendor_id"
+    t.string "product_name"
+    t.integer "amount", default: 1
+    t.decimal "price_gross"
+    t.decimal "price_net"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["vendor_id"], name: "index_products_on_vendor_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -25,4 +59,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_10_103214) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  create_table "vendors", force: :cascade do |t|
+    t.bigint "address_id"
+    t.bigint "user_id"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_vendors_on_address_id"
+    t.index ["user_id"], name: "index_vendors_on_user_id"
+  end
+
+  add_foreign_key "addresses", "locations"
+  add_foreign_key "addresses", "users"
+  add_foreign_key "products", "vendors"
+  add_foreign_key "vendors", "addresses"
+  add_foreign_key "vendors", "users"
 end
