@@ -1,7 +1,8 @@
 # vendor model
 class Vendor < ApplicationRecord
-  belongs_to :location
   has_many :products
+  has_many :orders
+  belongs_to :location
   belongs_to :user
   belongs_to :address
 end
