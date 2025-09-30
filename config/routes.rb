@@ -10,6 +10,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     get "dashboard", to: "dashboard#dashboard"
+    get "roles", to: "roles#roles_index"
+    post "roles", to: "roles#create"
+    get "profile", to: 'users#profile'
   end
 
 
