@@ -2,7 +2,11 @@
 class Api::OrdersController < ApplicationController
 
   def order_index
-    render json: { orders: Order.all }
+    orders = Order.joins(:product)
+                        .select("orders.id, orders.order_status, orders.order_note_vendor,
+                                        orders.order_number, products.product_name as product_name,
+                                        products.price_gross as price_gross")
+    render json: orders.as_json(only: [:id, :order_status, :order_number, :order_note_vendor], methods: [:product_name, :price_gross])
   end
 
   def create_order
@@ -17,6 +21,6 @@ class Api::OrdersController < ApplicationController
   private
 
   def order_params
-    params.require(:order).permit(:vendor_id, :product_id, :user_id, :order_status, :order_note_vendor, :order_number)
+    params.require(:order).permit(:vendor_id, :product_id, :order_status, :order_note_vendor, :order_number)
   end
 end
