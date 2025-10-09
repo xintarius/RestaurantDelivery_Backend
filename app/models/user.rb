@@ -7,4 +7,5 @@ class User < ApplicationRecord
   belongs_to :role
   has_many :vendors
   has_many :orders
+  has_one :address, dependent: :destroy
 end

@@ -20,6 +20,11 @@ module Api
         end
       end
 
+      def destroy
+        reset_session
+        head :no_content
+      end
+
       private
 
       def respond_to_on_destroy

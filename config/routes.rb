@@ -9,12 +9,14 @@ Rails.application.routes.draw do
              }
 
   namespace :api do
+    delete 'logout', to: 'users/sessions#destroy'
     get "dashboard", to: "dashboard#dashboard"
     get "roles", to: "roles#roles_index"
     get "profile", to: 'users#profile'
     get "orders", to: 'orders#order_index'
     post "roles", to: "roles#create"
     post 'create_order', to: 'orders#create_order'
+
   end
 
 
