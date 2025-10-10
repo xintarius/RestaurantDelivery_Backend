@@ -18,6 +18,16 @@ class Api::OrdersController < ApplicationController
     end
   end
 
+  def active_client_orders
+    active_client_order = Order.where(order_status: "Created", user_id: current_user.id).joins(:product).select('orders.order_status, products.product_name as product_name')
+    render json: active_client_order
+  end
+
+  def finished_client_orders
+    finished_client_order = Order.where(order_status: "finished", user_id: current_user.id).joins(:product).select('orders.order_status, products.product_name as product_name')
+    render json: finished_client_order
+  end
+
   private
 
   def order_params
