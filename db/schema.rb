@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_addresses_on_location_id"
     t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "cart_products", force: :cascade do |t|
+    t.bigint "cart_summary_id"
+    t.bigint "product_id"
+    t.integer "quantity"
+    t.integer "unit_price"
+    t.integer "total_price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cart_summary_id"], name: "index_cart_products_on_cart_summary_id"
+    t.index ["product_id"], name: "index_cart_products_on_product_id"
+  end
+
+  create_table "cart_summaries", force: :cascade do |t|
+    t.bigint "order_id"
+    t.bigint "user_id"
+    t.integer "gross_payment"
+    t.integer "net_payment"
+    t.decimal "vat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_cart_summaries_on_order_id"
+    t.index ["user_id"], name: "index_cart_summaries_on_user_id"
   end
 
   create_table "courier_payments", force: :cascade do |t|
@@ -85,8 +109,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "orders", force: :cascade do |t|
+  create_table "order_products", force: :cascade do |t|
+    t.bigint "order_id"
     t.bigint "product_id"
+    t.integer "quantity"
+    t.integer "unit_price"
+    t.integer "total_price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_products_on_order_id"
+    t.index ["product_id"], name: "index_order_products_on_product_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
     t.bigint "vendor_id"
     t.bigint "user_id"
     t.string "order_status", default: "pending"
@@ -95,7 +130,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
     t.string "order_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_orders_on_product_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
     t.index ["vendor_id"], name: "index_orders_on_vendor_id"
   end
@@ -197,6 +231,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
 
   add_foreign_key "addresses", "locations"
   add_foreign_key "addresses", "users"
+  add_foreign_key "cart_products", "cart_summaries"
+  add_foreign_key "cart_products", "products"
+  add_foreign_key "cart_summaries", "orders"
+  add_foreign_key "cart_summaries", "users"
   add_foreign_key "courier_payments", "courier_traces"
   add_foreign_key "courier_payments", "couriers"
   add_foreign_key "courier_payments", "orders"
@@ -208,7 +246,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
   add_foreign_key "couriers", "orders", column: "orders_id"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users", column: "users_id"
-  add_foreign_key "orders", "products"
+  add_foreign_key "order_products", "orders"
+  add_foreign_key "order_products", "products"
   add_foreign_key "orders", "users"
   add_foreign_key "orders", "vendors"
   add_foreign_key "products", "vendors"
