@@ -1,6 +1,6 @@
 # roles controller
 class Api::RolesController < ApplicationController
-
+  before_action :authenticate_user!
   def roles_index
     roles = Role.all
     render json: roles

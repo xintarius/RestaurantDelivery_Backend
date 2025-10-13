@@ -1,6 +1,6 @@
 # orders controller
 class Api::OrdersController < ApplicationController
-
+  before_action :authenticate_user!
   def order_index
     orders = Order.includes(:order_product, :product).all
 
