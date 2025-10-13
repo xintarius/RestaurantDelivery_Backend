@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_13_094147) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_addresses_on_location_id"
     t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "courier_payments", force: :cascade do |t|
+    t.bigint "courier_id"
+    t.bigint "order_id"
+    t.bigint "courier_trace_id"
+    t.integer "gross_payment"
+    t.integer "net_payment"
+    t.decimal "vat"
+    t.string "kilometer_distance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_courier_payments_on_courier_id"
+    t.index ["courier_trace_id"], name: "index_courier_payments_on_courier_trace_id"
+    t.index ["order_id"], name: "index_courier_payments_on_order_id"
+  end
+
+  create_table "courier_traces", force: :cascade do |t|
+    t.bigint "courier_id"
+    t.bigint "vendor_id"
+    t.bigint "order_id"
+    t.string "trace_from_start"
+    t.string "trace_to_collect_order"
+    t.string "trace_from_vendor"
+    t.string "trace_to_client"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_courier_traces_on_courier_id"
+    t.index ["order_id"], name: "index_courier_traces_on_order_id"
+    t.index ["vendor_id"], name: "index_courier_traces_on_vendor_id"
   end
 
   create_table "couriers", force: :cascade do |t|
@@ -113,6 +143,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_payments", force: :cascade do |t|
+    t.bigint "user_id"
+    t.integer "prace_per_order"
+    t.integer "gross_payment"
+    t.integer "net_payment"
+    t.decimal "vat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_payments_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -129,6 +170,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
     t.index ["role_id"], name: "index_users_on_role_id"
   end
 
+  create_table "vendor_payments", force: :cascade do |t|
+    t.bigint "vendor_id"
+    t.bigint "order_id"
+    t.integer "price_per_order"
+    t.integer "gross_payment"
+    t.integer "net_payment"
+    t.decimal "vat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_vendor_payments_on_order_id"
+    t.index ["vendor_id"], name: "index_vendor_payments_on_vendor_id"
+  end
+
   create_table "vendors", force: :cascade do |t|
     t.bigint "address_id"
     t.bigint "user_id"
@@ -143,6 +197,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
 
   add_foreign_key "addresses", "locations"
   add_foreign_key "addresses", "users"
+  add_foreign_key "courier_payments", "courier_traces"
+  add_foreign_key "courier_payments", "couriers"
+  add_foreign_key "courier_payments", "orders"
+  add_foreign_key "courier_traces", "couriers"
+  add_foreign_key "courier_traces", "orders"
+  add_foreign_key "courier_traces", "vendors"
   add_foreign_key "couriers", "addresses", column: "addresses_id"
   add_foreign_key "couriers", "locations", column: "locations_id"
   add_foreign_key "couriers", "orders", column: "orders_id"
@@ -156,7 +216,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_072318) do
   add_foreign_key "reviews", "products", column: "products_id"
   add_foreign_key "reviews", "users", column: "users_id"
   add_foreign_key "reviews", "vendors", column: "vendors_id"
+  add_foreign_key "user_payments", "users"
   add_foreign_key "users", "roles"
+  add_foreign_key "vendor_payments", "orders"
+  add_foreign_key "vendor_payments", "vendors"
   add_foreign_key "vendors", "addresses"
   add_foreign_key "vendors", "users"
 end
