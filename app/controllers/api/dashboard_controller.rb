@@ -3,7 +3,7 @@ module Api
   before_action :authenticate_user!
 
   def dashboard
-    render json: { email: @current_user.email, image_url: "/kebab.jpeg" }
+    render json: { email: @current_user.email }
   end
   end
 end
