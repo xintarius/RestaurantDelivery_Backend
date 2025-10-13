@@ -4,6 +4,8 @@ class Order < ApplicationRecord
   belongs_to :vendor
   belongs_to :product
   has_many :order_product
+  has_many :courier_orders
+  has_many :couriers, through: :courier_orders
   has_many :products, through: :order_product
 
   def products_list

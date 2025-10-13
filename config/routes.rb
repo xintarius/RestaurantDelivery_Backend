@@ -25,6 +25,8 @@ Rails.application.routes.draw do
 
     get "vendors", to: "vendors#vendors"
 
+    get "courier_interface", to: "courier#courier_interface"
+
   end
 
 

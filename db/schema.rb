@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_13_125706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,6 +53,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
     t.index ["user_id"], name: "index_cart_summaries_on_user_id"
   end
 
+  create_table "courier_orders", force: :cascade do |t|
+    t.bigint "courier_id"
+    t.bigint "order_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id", "order_id"], name: "index_courier_orders_on_courier_id_and_order_id", unique: true
+    t.index ["courier_id"], name: "index_courier_orders_on_courier_id"
+    t.index ["order_id"], name: "index_courier_orders_on_order_id"
+  end
+
   create_table "courier_payments", force: :cascade do |t|
     t.bigint "courier_id"
     t.bigint "order_id"
@@ -85,7 +95,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
 
   create_table "couriers", force: :cascade do |t|
     t.bigint "users_id"
-    t.bigint "orders_id"
     t.bigint "addresses_id"
     t.bigint "locations_id"
     t.bigint "roles_id"
@@ -96,7 +105,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
     t.datetime "updated_at", null: false
     t.index ["addresses_id"], name: "index_couriers_on_addresses_id"
     t.index ["locations_id"], name: "index_couriers_on_locations_id"
-    t.index ["orders_id"], name: "index_couriers_on_orders_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
     t.index ["users_id"], name: "index_couriers_on_users_id"
   end
@@ -235,6 +243,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
   add_foreign_key "cart_products", "products"
   add_foreign_key "cart_summaries", "orders"
   add_foreign_key "cart_summaries", "users"
+  add_foreign_key "courier_orders", "couriers"
+  add_foreign_key "courier_orders", "orders"
   add_foreign_key "courier_payments", "courier_traces"
   add_foreign_key "courier_payments", "couriers"
   add_foreign_key "courier_payments", "orders"
@@ -243,7 +253,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_13_104050) do
   add_foreign_key "courier_traces", "vendors"
   add_foreign_key "couriers", "addresses", column: "addresses_id"
   add_foreign_key "couriers", "locations", column: "locations_id"
-  add_foreign_key "couriers", "orders", column: "orders_id"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users", column: "users_id"
   add_foreign_key "order_products", "orders"

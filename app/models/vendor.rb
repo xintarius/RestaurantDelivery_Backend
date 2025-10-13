@@ -5,4 +5,6 @@ class Vendor < ApplicationRecord
   belongs_to :location
   belongs_to :user
   belongs_to :address
+
+  self.table_name = 'vendors'
 end
