@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     get "profile", to: "users#profile"
 
     get "orders", to: "orders#order_index"
+    get "client_menu", to: "orders#client_menu"
     post "create_order", to: "orders#create_order"
 
     get "active_client_orders", to: "orders#active_client_orders"
@@ -27,6 +28,7 @@ Rails.application.routes.draw do
 
     get "courier_interface", to: "courier#courier_interface"
 
+    post "create_product", to: "products#create_product"
   end
 
 

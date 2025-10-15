@@ -26,6 +26,11 @@ class Api::OrdersController < ApplicationController
     render json: finished_client_order
   end
 
+  def client_menu
+    products_for_client = Product.select("id, product_name, file_path, description")
+    render json: products_for_client
+  end
+
   private
 
   def order_params
