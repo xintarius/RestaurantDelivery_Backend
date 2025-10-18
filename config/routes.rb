@@ -29,8 +29,10 @@ Rails.application.routes.draw do
     get "courier_interface", to: "courier#courier_interface"
 
     post "create_product", to: "products#create_product"
+
+    namespace :v1 do
+    get "earnings/courier/:id", to: "billing#earnings"
+    end
   end
-
-
 end
 
