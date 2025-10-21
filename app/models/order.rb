@@ -2,11 +2,11 @@
 class Order < ApplicationRecord
   belongs_to :user
   belongs_to :vendor
-  belongs_to :product
-  has_many :order_product
+  has_many :order_products, dependent: :destroy
+  accepts_nested_attributes_for :order_products
   has_many :courier_orders
   has_many :couriers, through: :courier_orders
-  has_many :products, through: :order_product
+  has_many :products, through: :order_products
 
   def products_list
     order_product.map do |op|

@@ -8,13 +8,33 @@ class Api::OrdersController < ApplicationController
   end
 
   def create_order
-    order = current_user.orders.new(order_params)
+    order = current_user.orders.new(
+      vendor_id: params[:order][:vendor_id],
+      order_status: params[:order][:order_status],
+      order_note_vendor: params[:order][:order_note_vendor],
+      order_number: params[:order][:order_number]
+    )
+
     if order.save
-      render json: order, status: :created
+      order.order_products.create!(
+        product_id: params[:order][:product_id],
+        quantity: params[:order][:quantity]
+      )
+
+      render json: order.as_json(
+        include: {
+          order_products: {
+            include: { product: { only: [:id, :product_name, :price] } },
+            only: [:quantity]
+          }
+        }
+      ), status: :created
     else
-      render json: { errors: order.errors }, status: :unprocessable_entity
+      Rails.logger.error "Order not saved: #{order.errors.full_messages}"
+      render json: { errors: order.errors.full_messages }, status: :unprocessable_content
     end
   end
+
 
   def active_client_orders
     active_client_order = Order.where(order_status: "Created", user_id: current_user.id).joins(:product).select('orders.order_status, products.product_name as product_name')
@@ -34,6 +54,13 @@ class Api::OrdersController < ApplicationController
   private
 
   def order_params
-    params.require(:order).permit(:vendor_id, :order_status, :order_note_vendor, :order_number)
+    params.require(:order).permit(
+      :vendor_id,
+      :order_status,
+      :order_note_vendor,
+      :order_number,
+      :product_id,
+      :quantity
+    )
   end
 end
