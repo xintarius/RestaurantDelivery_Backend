@@ -20,6 +20,9 @@ class Api::UsersController < ApplicationController
   end
 
   def address_data
+    address = current_user.address
+
+    return {} unless address.present?
     {
       street: current_user.address.street,
       city: current_user.address.city,

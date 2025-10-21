@@ -1,17 +1,26 @@
 class Api::Users::RegistrationsController < Devise::RegistrationsController
-  respond_to :json
+  skip_before_action :verify_authenticity_token
+  before_action :configure_permitted_parameters, if: :devise_controller?
 
-  private
+  def create
+    build_resource(sign_up_params)
 
-  def respond_with(resource, _opts = {})
-    if resource.persisted?
-      render json: { message: "User registered successfully." }, status: :ok
+    if resource.save
+      token, _payload = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil)
+
+      render json: {
+        message: "User registered and logged in successfully.",
+        user: resource.as_json(only: [:id, :email, :username, :phone_number, :role_id]),
+        token: token
+      }, status: :ok
     else
-      if resource.errors.details[:email]&.any? { |e| e[:error] == :taken }
-        render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
-      else
-        render json: {errors: resource.errors.full_messages }, status: :internal_server_error
-      end
+      render json: { errors: resource.errors.full_messages }, status: :unprocessable_content
     end
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :password, :password_confirmation, :username, :phone_number])
   end
 end
