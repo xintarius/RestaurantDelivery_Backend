@@ -31,6 +31,9 @@ gem 'rack-cors', require: 'rack/cors'
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+gem "sentry-rails"
+gem "sentry-ruby"
+
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
