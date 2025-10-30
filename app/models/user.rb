@@ -9,7 +9,6 @@ class User < ApplicationRecord
   has_many :vendors
   has_many :orders
   has_one :address, dependent: :destroy
-
   before_validation :set_default_role, on: :create
 
   private

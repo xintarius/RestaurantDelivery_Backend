@@ -6,5 +6,5 @@ class Vendor < ApplicationRecord
   belongs_to :user
   belongs_to :address
 
-  self.table_name = 'vendors'
+  self.table_name = "vendors"
 end
