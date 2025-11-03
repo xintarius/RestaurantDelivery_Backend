@@ -2,7 +2,7 @@
 class Api::OrdersController < ApplicationController
   before_action :authenticate_user!
   def order_index
-    orders = Order.includes(:order_product, :product).all
+    orders = Order.includes(:order_products, :products).all
 
     render json: orders.as_json(only: [:id, :order_status, :order_number, :order_note_vendor], methods: [:products_list])
   end
@@ -37,12 +37,12 @@ class Api::OrdersController < ApplicationController
 
 
   def active_client_orders
-    active_client_order = Order.where(order_status: "Created", user_id: current_user.id).joins(:product).select('orders.order_status, products.product_name as product_name')
+    active_client_order = Order.where(order_status: "Created", user_id: current_user.id).joins(:products).select('orders.order_status, products.product_name as product_name')
     render json: active_client_order
   end
 
   def finished_client_orders
-    finished_client_order = Order.where(order_status: "finished", user_id: current_user.id).joins(:product).select('orders.order_status, products.product_name as product_name')
+    finished_client_order = Order.where(order_status: "finished", user_id: current_user.id).joins(:products).select('orders.order_status, products.product_name as product_name')
     render json: finished_client_order
   end
 

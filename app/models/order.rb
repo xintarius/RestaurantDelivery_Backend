@@ -9,7 +9,7 @@ class Order < ApplicationRecord
   has_many :products, through: :order_products
 
   def products_list
-    order_product.map do |op|
+    order_products.map do |op|
       {
         product_name: op.product.product_name,
         price_gross: op.unit_price,
