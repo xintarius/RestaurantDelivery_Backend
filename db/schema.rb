@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_03_120638) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_addresses_on_location_id"
     t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "calendars", force: :cascade do |t|
+    t.date "date"
+    t.integer "weekday"
+    t.string "timeline_nr"
+    t.integer "year"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_calendars_on_date", unique: true
   end
 
   create_table "cart_products", force: :cascade do |t|
@@ -61,6 +71,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
     t.index ["courier_id", "order_id"], name: "index_courier_orders_on_courier_id_and_order_id", unique: true
     t.index ["courier_id"], name: "index_courier_orders_on_courier_id"
     t.index ["order_id"], name: "index_courier_orders_on_order_id"
+  end
+
+  create_table "courier_payment_daily_aggregates", force: :cascade do |t|
+    t.bigint "calendars_id"
+    t.bigint "courier_id"
+    t.integer "delivery_count", default: 0
+    t.decimal "sum_gross", precision: 10, scale: 2
+    t.decimal "sum_net", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendars_id"], name: "index_courier_payment_daily_aggregates_on_calendars_id"
+    t.index ["courier_id", "calendars_id"], name: "idx_on_courier_id_calendars_id_021615db87", unique: true
+    t.index ["courier_id"], name: "index_courier_payment_daily_aggregates_on_courier_id"
   end
 
   create_table "courier_payments", force: :cascade do |t|
@@ -115,6 +138,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
     t.string "latitude"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "notification_users", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "notification_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notification_id"], name: "index_notification_users_on_notification_id"
+    t.index ["user_id"], name: "index_notification_users_on_user_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "title"
+    t.string "description"
+    t.string "sender"
+    t.datetime "received_date"
+    t.boolean "read", default: false
   end
 
   create_table "order_products", force: :cascade do |t|
@@ -187,6 +227,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "terminal_calendars", force: :cascade do |t|
+    t.bigint "terminal_id"
+    t.bigint "calendars_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendars_id"], name: "index_terminal_calendars_on_calendars_id"
+    t.index ["terminal_id"], name: "index_terminal_calendars_on_terminal_id"
+  end
+
+  create_table "terminals", force: :cascade do |t|
+    t.time "hour_from"
+    t.time "hour_to"
+    t.integer "courier_limit"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "user_payments", force: :cascade do |t|
     t.bigint "user_id"
     t.integer "prace_per_order"
@@ -249,6 +306,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
   add_foreign_key "cart_summaries", "users"
   add_foreign_key "courier_orders", "couriers"
   add_foreign_key "courier_orders", "orders"
+  add_foreign_key "courier_payment_daily_aggregates", "calendars", column: "calendars_id"
+  add_foreign_key "courier_payment_daily_aggregates", "couriers"
   add_foreign_key "courier_payments", "courier_traces"
   add_foreign_key "courier_payments", "couriers"
   add_foreign_key "courier_payments", "orders"
@@ -259,6 +318,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
   add_foreign_key "couriers", "locations", column: "locations_id"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users", column: "users_id"
+  add_foreign_key "notification_users", "notifications"
+  add_foreign_key "notification_users", "users"
   add_foreign_key "order_products", "orders"
   add_foreign_key "order_products", "products"
   add_foreign_key "orders", "users"
@@ -268,6 +329,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_130042) do
   add_foreign_key "reviews", "products", column: "products_id"
   add_foreign_key "reviews", "users", column: "users_id"
   add_foreign_key "reviews", "vendors", column: "vendors_id"
+  add_foreign_key "terminal_calendars", "calendars", column: "calendars_id"
+  add_foreign_key "terminal_calendars", "terminals"
   add_foreign_key "user_payments", "users"
   add_foreign_key "users", "roles"
   add_foreign_key "vendor_payments", "orders"
