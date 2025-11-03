@@ -8,6 +8,10 @@ Rails.application.routes.draw do
                registrations: "api/users/registrations"
              }
 
+  devise_scope :user do
+    post "/api/vendor_register", to: "api/users/registrations#vendor_register"
+  end
+
   namespace :api do
     delete "logout", to: "users/sessions#destroy"
     get "dashboard", to: "dashboard#dashboard"
@@ -30,6 +34,7 @@ Rails.application.routes.draw do
 
     post "create_product", to: "products#create_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
+
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
     end
