@@ -23,7 +23,7 @@ Rails.application.routes.draw do
 
     get "orders", to: "orders#order_index"
     get "client_menu", to: "orders#client_menu"
-    post "create_order", to: "orders#create_order"
+    post "create_order_from_cart", to: "orders#create_order_from_cart"
 
     get "active_client_orders", to: "orders#active_client_orders"
     get "finished_client_orders", to: "orders#finished_client_orders"

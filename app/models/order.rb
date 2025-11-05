@@ -8,6 +8,7 @@ class Order < ApplicationRecord
   has_many :couriers, through: :courier_orders
   has_many :products, through: :order_products
 
+  before_create :generate_order_number
   def products_list
     order_products.map do |op|
       {
@@ -17,5 +18,11 @@ class Order < ApplicationRecord
         total_price: op.total_price
       }
     end
+  end
+
+  private
+
+  def generate_order_number
+    self.order_number ||= "ORD-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(3).upcase}"
   end
 end

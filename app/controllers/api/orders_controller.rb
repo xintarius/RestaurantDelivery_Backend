@@ -7,32 +7,33 @@ class Api::OrdersController < ApplicationController
     render json: orders.as_json(only: [:id, :order_status, :order_number, :order_note_vendor], methods: [:products_list])
   end
 
-  def create_order
-    order = current_user.orders.new(
-      vendor_id: params[:order][:vendor_id],
-      order_status: params[:order][:order_status],
-      order_note_vendor: params[:order][:order_note_vendor],
-      order_number: params[:order][:order_number]
+  def create_order_from_cart
+    cart = current_user.cart_summaries.last
+    puts cart.inspect
+    if cart.blank? || cart.cart_products.empty?
+      return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
+    end
+
+    order = current_user.orders.create!(
+      vendor_id: cart.cart_products.first.product.vendor_id,
+      order_status: "created"
     )
 
-    if order.save
+    cart.cart_products.each do |cart_item|
       order.order_products.create!(
-        product_id: params[:order][:product_id],
-        quantity: params[:order][:quantity]
+        product_id: cart_item.product_id,
+        quantity: cart_item.quantity
       )
-
-      render json: order.as_json(
-        include: {
-          order_products: {
-            include: { product: { only: [:id, :product_name, :price] } },
-            only: [:quantity]
-          }
-        }
-      ), status: :created
-    else
-      Rails.logger.error "Order not saved: #{order.errors.full_messages}"
-      render json: { errors: order.errors.full_messages }, status: :unprocessable_content
     end
+
+    render json: order.as_json(
+      include: {
+        order_products: {
+          include: { product: { only: [ :product_name, :price_gross ] } },
+          only: [ :quantity ]
+        }
+      }
+    ), status: :created
   end
 
 
