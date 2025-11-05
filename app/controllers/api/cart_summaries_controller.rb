@@ -1,6 +1,17 @@
 # cart summary controller
 class Api::CartSummariesController < ApplicationController
 
+  def cart_summary
+    cart_summaries = CartSummary.joins(:cart_products)
+                                .where(user_id: current_user)
+                                .select("cart_products.quantity as quantity,
+                                cart_products.unit_price as price,
+                                cart_products.total_price as total_price, cart_summaries.id as id,
+                                gross_payment, net_payment")
+
+    render json: cart_summaries
+  end
+
   def add_to_cart
     cart_summary = CartSummary.new(cart_summary_params)
 

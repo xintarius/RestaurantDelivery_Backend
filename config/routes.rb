@@ -35,6 +35,8 @@ Rails.application.routes.draw do
     post "create_product", to: "products#create_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 
+    get "cart_summary", to: "cart_summaries#cart_summary"
+
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
     end
