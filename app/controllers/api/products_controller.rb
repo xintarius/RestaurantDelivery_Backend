@@ -2,6 +2,13 @@
 class Api::ProductsController < ApplicationController
   before_action :authenticate_user!
 
+  def get_products
+    vendor = Vendor.where(user_id: current_user)
+    products = Product.where(vendor_id: vendor).pluck(:product_name, :file_path, :description, :price_gross)
+
+    render json: products
+  end
+
   def create_product
     user = current_user.id
     vendor = Vendor.find_by(user_id: user)

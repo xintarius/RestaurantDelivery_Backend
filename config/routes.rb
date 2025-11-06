@@ -32,6 +32,7 @@ Rails.application.routes.draw do
 
     get "courier_interface", to: "courier#courier_interface"
 
+    get "get_products", to: "products#get_products"
     post "create_product", to: "products#create_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 
