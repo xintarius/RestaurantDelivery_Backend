@@ -37,6 +37,8 @@ Rails.application.routes.draw do
 
     get "cart_summary", to: "cart_summaries#cart_summary"
 
+    post "user_payment", to: "payments#user_payment"
+
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
     end
