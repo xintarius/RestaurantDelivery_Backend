@@ -37,8 +37,10 @@ Rails.application.routes.draw do
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 
     get "cart_summary", to: "cart_summaries#cart_summary"
-
+    get "get_cart_sum", to: "cart_summaries#get_cart_sum"
     post "user_payment", to: "payments#user_payment"
+
+    get "get_address", to: "addresses#get_address"
 
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
