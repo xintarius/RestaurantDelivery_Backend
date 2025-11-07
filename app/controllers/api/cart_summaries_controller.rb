@@ -12,6 +12,12 @@ class Api::CartSummariesController < ApplicationController
     render json: cart_summaries
   end
 
+  def get_cart_sum
+    sum_cart = CartSummary.where(user_id: current_user).sum(:gross_payment).to_f.round(2)
+
+    render json: { total: sprintf("%.2f", sum_cart) }
+  end
+
   def add_to_cart
     cart_summary = CartSummary.new(cart_summary_params)
 
