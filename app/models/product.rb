@@ -7,7 +7,7 @@ class Product < ApplicationRecord
   has_many :orders, through: :order_products
   self.table_name = "products"
 
-  def price_gross
+  def order_price_gross
     order_products.first&.unit_price
   end
 end

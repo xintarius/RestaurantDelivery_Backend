@@ -1,11 +1,11 @@
 # products controller
 class Api::ProductsController < ApplicationController
-  before_action :authenticate_user!
+  # before_action :authenticate_user!
 
   def get_products
     vendor = Vendor.where(user_id: current_user)
-    products = Product.where(vendor_id: vendor).select(:id, :product_name, :file_path, :description, :price_gross)
-
+    products = Product.select(:id, :product_name, :file_path, :description, :price_gross)
+    puts products.inspect
     render json: products.as_json
   end
 

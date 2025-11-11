@@ -2,7 +2,7 @@
 class Api::VendorsController < ApplicationController
   before_action :authenticate_user!
   def vendors
-    per_page = params.fetch(:per_page, 5).to_i
+    per_page = params.fetch(:per_page, 12).to_i
     page = params.fetch(:page, 1).to_i
     vendors = Vendor.limit(per_page).offset((page - 1) * per_page)
                    .select("id, name, file_path, description")
