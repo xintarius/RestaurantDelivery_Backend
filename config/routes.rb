@@ -46,5 +46,7 @@ Rails.application.routes.draw do
     get "earnings/courier/:id", to: "billing#earnings"
     end
   end
+
+  mount ActionCable.server => '/cable'
 end
 

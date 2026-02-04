@@ -4,8 +4,7 @@ class Api::ProductsController < ApplicationController
 
   def get_products
     vendor = Vendor.where(user_id: current_user)
-    products = Product.select(:id, :product_name, :file_path, :description, :price_gross)
-    puts products.inspect
+    products = Product.where(vendor_id: vendor).select(:id, :product_name, :file_path, :description, :price_gross)
     render json: products.as_json
   end
 
