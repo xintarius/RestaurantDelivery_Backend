@@ -11,16 +11,24 @@ module ApplicationCable
     def find_verified_user
       token = request.params[:token]
 
+      secret = ENV["DEVISE_JWT_SECRET_KEY"]
+
       begin
-        decoded_token = JWT.decode(token, Rails.application.credentials.fetch(:secret_key_base))[0]
-        if (user = User.find(decoded_token["sub"]))
+        decoded = JWT.decode(token, secret, true, { algorithm: "HS256" })[0]
+
+        if (user = User.find_by(id: decoded["sub"]))
           user
         else
           reject_unauthorized_connection
         end
-      rescue
+      rescue JWT::DecodeError => e
+        STDOUT.puts "DEBUG: Błąd dekodowania JWT: #{e.message}"
+        reject_unauthorized_connection
+      rescue => e
+        STDOUT.puts "DEBUG: Inny błąd Action Cable: #{e.message}"
         reject_unauthorized_connection
       end
     end
   end
 end
+

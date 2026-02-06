@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :vendors
   has_many :orders
   has_many :cart_summaries
+  has_one :courier, dependent: :destroy
   has_many :notification_users
   has_many :notifications, through: :notification_users
   has_one :address, dependent: :destroy

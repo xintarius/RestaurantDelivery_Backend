@@ -14,19 +14,27 @@ class Api::OrdersController < ApplicationController
       return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
     end
 
-    order = current_user.orders.create!(
-      vendor_id: cart.cart_products.first.product.vendor_id,
-      order_status: "created"
-    )
-
-    cart.cart_products.each do |cart_item|
-      order.order_products.create!(
-        product_id: cart_item.product_id,
-        quantity: cart_item.quantity
+    ActiveRecord::Base.transaction do
+      @order = current_user.orders.create!(
+        vendor_id: cart.cart_products.first.product.vendor_id,
+        order_status: "created"
       )
+
+      cart.cart_products.each do |cart_item|
+        @order.order_products.create!(
+          product_id: cart_item.product_id,
+          quantity: cart_item.quantity
+        )
+      end
+
+      courier = Courier.find(1)
+
+      if courier
+        CourierOrder.create!(order: @order, courier: courier)
+      end
     end
 
-    render json: order.as_json(
+    render json: @order.as_json(
       include: {
         order_products: {
           include: { product: { only: [ :product_name, :price_gross ] } },
@@ -34,8 +42,9 @@ class Api::OrdersController < ApplicationController
         }
       }
     ), status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.message }, status: :unprocessable_entity
   end
-
 
   def active_client_orders
     active_client_order = Order.where(order_status: "Created", user_id: current_user.id).joins(:products).select('orders.order_status, products.product_name as product_name')

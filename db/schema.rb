@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_06_082012) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_06_234801) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,9 +126,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_06_082012) do
     t.string "vehicle_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
     t.index ["addresses_id"], name: "index_couriers_on_addresses_id"
     t.index ["locations_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
+    t.index ["user_id"], name: "index_couriers_on_user_id"
     t.index ["users_id"], name: "index_couriers_on_users_id"
   end
 
@@ -319,6 +321,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_06_082012) do
   add_foreign_key "couriers", "addresses", column: "addresses_id"
   add_foreign_key "couriers", "locations", column: "locations_id"
   add_foreign_key "couriers", "roles", column: "roles_id"
+  add_foreign_key "couriers", "users"
   add_foreign_key "couriers", "users", column: "users_id"
   add_foreign_key "notification_users", "notifications"
   add_foreign_key "notification_users", "users"
