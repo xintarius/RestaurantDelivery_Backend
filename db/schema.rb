@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_06_234801) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_10_145956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,7 +88,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_06_234801) do
 
   create_table "courier_payments", force: :cascade do |t|
     t.bigint "courier_id"
-    t.bigint "order_id"
     t.bigint "courier_trace_id"
     t.integer "gross_payment"
     t.integer "net_payment"
@@ -96,9 +95,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_06_234801) do
     t.string "kilometer_distance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "orders_id"
+    t.bigint "order_id"
     t.index ["courier_id"], name: "index_courier_payments_on_courier_id"
     t.index ["courier_trace_id"], name: "index_courier_payments_on_courier_trace_id"
     t.index ["order_id"], name: "index_courier_payments_on_order_id"
+    t.index ["orders_id"], name: "index_courier_payments_on_orders_id"
   end
 
   create_table "courier_traces", force: :cascade do |t|
@@ -315,6 +317,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_06_234801) do
   add_foreign_key "courier_payments", "courier_traces"
   add_foreign_key "courier_payments", "couriers"
   add_foreign_key "courier_payments", "orders"
+  add_foreign_key "courier_payments", "orders", column: "orders_id"
   add_foreign_key "courier_traces", "couriers"
   add_foreign_key "courier_traces", "orders"
   add_foreign_key "courier_traces", "vendors"
