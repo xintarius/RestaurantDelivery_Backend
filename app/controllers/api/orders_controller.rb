@@ -4,44 +4,15 @@ class Api::OrdersController < ApplicationController
   def order_index
     orders = Order.includes(:order_products, :products).all
 
-    render json: orders.as_json(only: [:id, :order_status, :order_number, :order_note_vendor], methods: [:products_list])
+    render json: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor ], methods: [:products_list])
   end
 
   def create_order_from_cart
     cart = current_user.cart_summaries.last
-    puts cart.inspect
     if cart.blank? || cart.cart_products.empty?
       return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
     end
-
-    ActiveRecord::Base.transaction do
-      @order = current_user.orders.create!(
-        vendor_id: cart.cart_products.first.product.vendor_id,
-        order_status: "created"
-      )
-
-      cart.cart_products.each do |cart_item|
-        @order.order_products.create!(
-          product_id: cart_item.product_id,
-          quantity: cart_item.quantity
-        )
-      end
-
-      courier = Courier.find(1)
-
-      if courier
-        CourierOrder.create!(order: @order, courier: courier)
-      end
-    end
-
-    render json: @order.as_json(
-      include: {
-        order_products: {
-          include: { product: { only: [ :product_name, :price_gross ] } },
-          only: [ :quantity ]
-        }
-      }
-    ), status: :created
+    PaymentService.pay_for_order(current_user, cart)
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.message }, status: :unprocessable_entity
   end

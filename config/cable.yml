@@ -4,6 +4,7 @@
 # to make the web console appear.
 development:
   adapter: async
+  url: ws://localhost:3000/cable
 
 test:
   adapter: test
