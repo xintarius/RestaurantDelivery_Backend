@@ -33,6 +33,6 @@ class Api::CartSummariesController < ApplicationController
   def cart_summary_params
     params.require(:cart_summary)
           .permit(:order_id, :user_id,
-                  cart_products_attributes: [ :product_id, :quantity ])
+                  cart_products_attributes: [ :product_id, :quantity, :unit_price, :total_price ])
   end
 end
