@@ -12,7 +12,16 @@ class Api::OrdersController < ApplicationController
     if cart.blank? || cart.cart_products.empty?
       return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
     end
-    PaymentService.pay_for_order(current_user, cart)
+    order = PaymentService.pay_for_order(current_user, cart)
+    render json: order.as_json(
+      include: {
+        order_products: {
+          include: { product: { only: [ :product_name, :price_gross ] } },
+          only: [ :quantity ]
+        }
+      }
+    ), status: :created
+    search_for_courier(order)
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.message }, status: :unprocessable_entity
   end
@@ -33,6 +42,14 @@ class Api::OrdersController < ApplicationController
   end
 
   private
+
+  def search_for_courier(order)
+    courier = Courier.find(1)
+
+    if courier
+      CourierOrder.create!(order: order, courier: courier)
+    end
+  end
 
   def order_params
     params.require(:order).permit(
