@@ -1,5 +1,6 @@
 # payment service
 class PaymentService
+
   def self.pay_for_order(user, cart)
     order = nil
     ActiveRecord::Base.transaction do

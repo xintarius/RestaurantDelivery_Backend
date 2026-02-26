@@ -42,11 +42,12 @@ Rails.application.routes.draw do
 
     get "get_address", to: "addresses#get_address"
 
+    delete "cart_products/:id", to: "cart_summaries#cart_products"
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
     end
   end
 
-  mount ActionCable.server => '/cable'
+  mount ActionCable.server => "/cable"
 end
 

@@ -8,20 +8,14 @@ class Api::OrdersController < ApplicationController
   end
 
   def create_order_from_cart
-    cart = current_user.cart_summaries.last
+    cart = CartSummary.find_by!(user_id: current_user, order_id: nil)
     if cart.blank? || cart.cart_products.empty?
       return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
     end
     order = PaymentService.pay_for_order(current_user, cart)
-    render json: order.as_json(
-      include: {
-        order_products: {
-          include: { product: { only: [ :product_name, :price_gross ] } },
-          only: [ :quantity ]
-        }
-      }
-    ), status: :created
+    cart.update!(order_id: order.id)
     search_for_courier(order)
+    render_respond(order)
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.message }, status: :unprocessable_entity
   end
@@ -49,6 +43,17 @@ class Api::OrdersController < ApplicationController
     if courier
       CourierOrder.create!(order: order, courier: courier)
     end
+  end
+
+  def render_respond(order)
+    render json: order.as_json(
+      include: {
+        order_products: {
+          include: { product: { only: [ :product_name, :price_gross ] } },
+          only: [ :quantity ]
+        }
+      }
+    ), status: :created
   end
 
   def order_params

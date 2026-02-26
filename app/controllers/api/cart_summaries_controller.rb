@@ -1,4 +1,4 @@
- # cart summary controller
+# cart summary controller
 class Api::CartSummariesController < ApplicationController
 
   def cart_summary
@@ -6,16 +6,17 @@ class Api::CartSummariesController < ApplicationController
                                 .where(user_id: current_user)
                                 .select("cart_products.quantity as quantity,
                                 cart_products.unit_price as price,
-                                cart_products.total_price as total_price, cart_summaries.id as id,
+                                cart_products.total_price as total_price, cart_products.id as id,
                                 gross_payment, net_payment")
 
     render json: cart_summaries
   end
 
   def get_cart_sum
-    sum_cart = CartSummary.where(user_id: current_user).sum(:gross_payment).to_f.round(2)
+    sum_cart = CartSummary.where(user_id: current_user)
+    cart_product = CartProduct.where(cart_summary_id: sum_cart).sum(:total_price).to_f.round(2)
 
-    render json: { total: sprintf("%.2f", sum_cart) }
+    render json: { total: sprintf("%.2f", cart_product) }
   end
 
   def add_to_cart
@@ -25,6 +26,16 @@ class Api::CartSummariesController < ApplicationController
       render json: cart_summary, include: :cart_products, status: :created
     else
       render json: { errors: cart_summary.errors.full_messages }, status: :no_content
+    end
+  end
+
+  def cart_products
+    cart_item = CartProduct.find_by!(id: params[:id])
+
+    if cart_item.destroy
+      render json: { message: "Usunięto pomyślnie" }, status: :ok
+    else
+      render json: { error: "Błąd usuwania" }, status: :unprocessable_entity
     end
   end
 
