@@ -3,7 +3,7 @@ class Api::CartSummariesController < ApplicationController
 
   def cart_summary
     cart_summaries = CartSummary.joins(:cart_products)
-                                .where(user_id: current_user)
+                                .where(user_id: current_user, order_id: nil)
                                 .select("cart_products.quantity as quantity,
                                 cart_products.unit_price as price,
                                 cart_products.total_price as total_price, cart_products.id as id,
