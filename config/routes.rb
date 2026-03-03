@@ -22,17 +22,20 @@ Rails.application.routes.draw do
     get "profile", to: "users#profile"
 
     get "orders", to: "orders#order_index"
-    get "client_menu", to: "orders#client_menu"
+    get "client_menu/:vendor_id", to: "orders#client_menu"
     post "create_order_from_cart", to: "orders#create_order_from_cart"
 
     get "active_client_orders", to: "orders#active_client_orders"
     get "finished_client_orders", to: "orders#finished_client_orders"
 
+    # vendor routes
     get "vendors", to: "vendors#vendors"
+    get "get_products", to: "products#get_products"
 
+    # courier routes
     get "courier_interface", to: "courier#courier_interface"
 
-    get "get_products", to: "products#get_products"
+
     post "create_product", to: "products#create_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 

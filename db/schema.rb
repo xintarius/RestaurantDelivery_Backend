@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_01_213355) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_cart_summaries_on_order_id"
     t.index ["user_id"], name: "index_cart_summaries_on_user_id"
+  end
+
+  create_table "category_types", force: :cascade do |t|
+    t.string "category_name"
+    t.string "category_code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "courier_orders", force: :cascade do |t|
@@ -299,6 +307,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "description"
     t.string "nip"
     t.boolean "activated_in_system", default: false
+    t.integer "category_type_id"
     t.index ["address_id"], name: "index_vendors_on_address_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
   end

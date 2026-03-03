@@ -31,7 +31,9 @@ class Api::OrdersController < ApplicationController
   end
 
   def client_menu
-    products_for_client = Product.select("id, product_name, file_path, description")
+    target_vendor_id = params[:vendor_id]
+    products_for_client = Product.where(vendor_id: target_vendor_id)
+                                 .select("id, product_name, file_path, description, price_gross")
     render json: products_for_client
   end
 
