@@ -2,14 +2,25 @@
 class Api::CartSummariesController < ApplicationController
 
   def cart_summary
-    cart_summaries = CartSummary.joins(:cart_products)
+    per_page = params.fetch(:per_page, 8).to_i
+    page = params.fetch(:page, 1).to_i
+    per_user = CartSummary.where(user_id: current_user.id, order_id: nil)
+    cart_summaries = CartSummary.limit(per_page).offset((page - 1) * per_page)
+                                .joins(:cart_products)
                                 .where(user_id: current_user, order_id: nil)
                                 .select("cart_products.quantity as quantity,
                                 cart_products.unit_price as price,
                                 cart_products.total_price as total_price, cart_products.id as id,
                                 gross_payment, net_payment")
 
-    render json: cart_summaries
+    render json: { data: cart_summaries.as_json,
+                   meta: {
+                     current_page: page,
+                     per_page: per_page,
+                     total_records: per_user.count,
+                     total_pages: (per_user.count / per_page .to_f).ceil
+                   }
+    }
   end
 
   def get_cart_sum
@@ -43,7 +54,7 @@ class Api::CartSummariesController < ApplicationController
 
   def cart_summary_params
     params.require(:cart_summary)
-          .permit(:order_id, :user_id, :gross_payment, :net_payment,
+          .permit(:order_id, :user_id, :gross_payment, :net_payment, :vendor_id,
                   cart_products_attributes: [ :product_id, :quantity, :unit_price, :total_price ])
   end
 end
