@@ -22,13 +22,17 @@ class Api::Users::RegistrationsController < Devise::RegistrationsController
     ActiveRecord::Base.transaction do
       user = User.create!(user_params.merge(role_id: 3))
       address = Address.create!(address_params)
-      vendor = Vendor.create!(vendor_params.merge(user_id: user.id, address_id: address.id))
+      vendor = Vendor.create!(vendor_params.merge(user_id: user.id,
+                                                  address_id: address.id,
+                                                  category_type_id: params.dig(:vendor, :category_type_id)
+        )
+      )
       token, _payload = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil)
 
       render json: {
-        message: "Vendor zarejestrowany i zalogowany",
+        message: "Zarejestrowano oraz zalogowano",
         user: user.as_json(only: [:email, :username, :phone_number, :role_id]),
-        vendor: vendor.as_json(only: [:name, :nip]),
+        vendor: vendor.as_json(only: [:name, :nip, :category_type_id]),
         token: token
       }, status: :created
     end
@@ -49,7 +53,7 @@ class Api::Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def vendor_params
-    params.require(:vendor).permit(:name, :nip)
+    params.require(:vendor).permit(:name, :nip, :category_type_id)
   end
 
 
