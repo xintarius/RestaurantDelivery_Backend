@@ -21,7 +21,7 @@ Rails.application.routes.draw do
 
     get "profile", to: "users#profile"
 
-    get "orders", to: "orders#order_index"
+    get "vendor_orders", to: "orders#vendor_orders"
     get "client_menu/:vendor_id", to: "orders#client_menu"
     post "create_order_from_cart", to: "orders#create_order_from_cart"
 

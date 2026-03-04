@@ -1,8 +1,9 @@
 # orders controller
 class Api::OrdersController < ApplicationController
   before_action :authenticate_user!
-  def order_index
-    orders = Order.includes(:order_products, :products).all
+  def vendor_orders
+    orders = Order.includes(:order_products, :products)
+                  .where(vendor_id: current_vendor)
 
     render json: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor ], methods: [:products_list])
   end
@@ -39,6 +40,9 @@ class Api::OrdersController < ApplicationController
 
   private
 
+  def current_vendor
+    Vendor.find_by!(user_id: current_user.id)
+  end
   def search_for_courier(order)
     courier = Courier.find(1)
 
