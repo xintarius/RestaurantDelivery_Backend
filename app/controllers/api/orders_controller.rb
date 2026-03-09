@@ -10,8 +10,8 @@ class Api::OrdersController < ApplicationController
 
   def create_order_from_cart
     cart = CartSummary.find_by!(user_id: current_user, order_id: nil)
-    if cart.blank? || cart.cart_products.empty?
-      return render json: { error: "Koszyk jest pusty" }, status: :unprocessable_entity
+    if cart.nil? || cart.cart_products.empty?
+      return render json: { error: "Koszyk jest pusty" }, status: :not_found
     end
     order = PaymentService.pay_for_order(current_user, cart)
     cart.update!(order_id: order.id)
