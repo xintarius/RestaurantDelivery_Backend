@@ -126,7 +126,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
   end
 
   create_table "couriers", force: :cascade do |t|
-    t.bigint "users_id"
     t.bigint "addresses_id"
     t.bigint "locations_id"
     t.bigint "roles_id"
@@ -140,7 +139,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
     t.index ["locations_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
     t.index ["user_id"], name: "index_couriers_on_user_id"
-    t.index ["users_id"], name: "index_couriers_on_users_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -333,7 +331,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
   add_foreign_key "couriers", "locations", column: "locations_id"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users"
-  add_foreign_key "couriers", "users", column: "users_id"
   add_foreign_key "notification_users", "notifications"
   add_foreign_key "notification_users", "users"
   add_foreign_key "order_products", "orders"
