@@ -4,7 +4,18 @@ class OrdersChannel < ApplicationCable::Channel
     stream_for current_user
 
     courier = current_user.courier
-    return transmit({ type: 'ERROR', message: "Profil kuriera już istnieje"}) unless courier
+
+    zone = Zone.find_by(location_id: courier.location_id)
+
+    if zone
+      transmit({
+                 type: "INITIAL_CONFIGURATION",
+                 zone: {
+                   name: zone.name,
+                   polygon: zone.polygon_path
+                 }
+               })
+    end
 
     active_order = courier.orders.where(order_status: ["ACCEPTED", "IN_DELIVERY"]).first
     if active_order

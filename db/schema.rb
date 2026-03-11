@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -311,6 +311,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
     t.index ["user_id"], name: "index_vendors_on_user_id"
   end
 
+  create_table "zones", force: :cascade do |t|
+    t.bigint "location_id", null: false
+    t.string "name"
+    t.jsonb "polygon_path", default: []
+    t.boolean "active", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_zones_on_location_id"
+  end
+
   add_foreign_key "addresses", "locations"
   add_foreign_key "addresses", "users"
   add_foreign_key "cart_products", "cart_summaries"
@@ -350,4 +360,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_03_125151) do
   add_foreign_key "vendor_payments", "vendors"
   add_foreign_key "vendors", "addresses"
   add_foreign_key "vendors", "users"
+  add_foreign_key "zones", "locations"
 end
