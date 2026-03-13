@@ -2,10 +2,11 @@
 class Api::CourierController < ApplicationController
 
   def courier_profile
-    couriers_data = User.joins(:address)
+    couriers_data = User.joins(:address, :courier)
                         .select('users.email, users.username, users.name,
                         users.last_name, users.phone_number, users.created_at,
-                        addresses.city as city, addresses.postal_code as postal_code')
+                        addresses.city as city, addresses.postal_code as postal_code,
+                        couriers.courier_number as courier_number')
                         .find(current_user.id)
     render json: couriers_data
   end
