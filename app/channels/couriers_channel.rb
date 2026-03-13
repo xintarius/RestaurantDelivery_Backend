@@ -13,7 +13,5 @@ class CouriersChannel < ApplicationCable::Channel
              })
   end
 
-  def unsubscribed
-
-  end
+  def unsubscribed ;end
 end

@@ -34,6 +34,7 @@ Rails.application.routes.draw do
 
     # courier routes
     get "courier_interface", to: "courier#courier_interface"
+    get "courier_profile", to: "courier#courier_profile"
 
 
     post "create_product", to: "products#create_product"

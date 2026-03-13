@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_13_164852) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -127,7 +127,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
 
   create_table "couriers", force: :cascade do |t|
     t.bigint "addresses_id"
-    t.bigint "locations_id"
+    t.bigint "location_id"
     t.bigint "roles_id"
     t.string "courier_status", default: "Offline"
     t.string "courier_code"
@@ -135,8 +135,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.string "courier_number"
     t.index ["addresses_id"], name: "index_couriers_on_addresses_id"
-    t.index ["locations_id"], name: "index_couriers_on_locations_id"
+    t.index ["location_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
     t.index ["user_id"], name: "index_couriers_on_user_id"
   end
@@ -278,6 +279,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
     t.string "phone_number"
     t.string "stripe_customer_id"
     t.string "stripe_payment_method_id"
+    t.string "name"
+    t.string "last_name"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role_id"], name: "index_users_on_role_id"
@@ -338,7 +341,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_11_002730) do
   add_foreign_key "courier_traces", "orders"
   add_foreign_key "courier_traces", "vendors"
   add_foreign_key "couriers", "addresses", column: "addresses_id"
-  add_foreign_key "couriers", "locations", column: "locations_id"
+  add_foreign_key "couriers", "locations"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users"
   add_foreign_key "notification_users", "notifications"

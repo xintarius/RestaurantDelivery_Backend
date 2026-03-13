@@ -1,6 +1,15 @@
 # courier_controller
 class Api::CourierController < ApplicationController
 
+  def courier_profile
+    couriers_data = User.joins(:address)
+                        .select('users.email, users.username, users.name,
+                        users.last_name, users.phone_number, users.created_at,
+                        addresses.city as city, addresses.postal_code as postal_code')
+                        .find(current_user.id)
+    render json: couriers_data
+  end
+
   def courier_interface
     courier_order = Vendor.joins(:orders)
                           .select("vendors.name as vendor_name, orders.order_status as order_status, orders.id as order_id")
@@ -9,5 +18,5 @@ class Api::CourierController < ApplicationController
     OrdersChannel.broadcast_to(cur_user, { type: "REFRESH_ORDERS", orders: courier_order })
 
     render json: courier_order
-    end
+  end
 end

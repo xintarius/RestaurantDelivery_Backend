@@ -5,7 +5,7 @@ class OrdersChannel < ApplicationCable::Channel
 
     courier = current_user.courier
 
-    zone = Zone.find_by(location_id: courier.location_id)
+    zone = Zone.find_by!(location_id: courier.location_id)
 
     if zone
       transmit({
