@@ -46,6 +46,8 @@ Rails.application.routes.draw do
 
     get "get_address", to: "addresses#get_address"
 
+    get "get_notification", to: "notifications#get_notification"
+
     get "category_types", to: "category_types#category"
     get "category_types/:category_id/vendors", to: "category_types#find_category"
     delete "cart_products/:id", to: "cart_summaries#cart_products"
