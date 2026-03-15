@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_14_163152) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_15_003805) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -151,10 +151,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_14_163152) do
   end
 
   create_table "notification_roles", force: :cascade do |t|
-    t.string "notification"
-    t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notification_id", null: false
+    t.bigint "role_id", null: false
+    t.index ["notification_id"], name: "index_notification_roles_on_notification_id"
+    t.index ["role_id"], name: "index_notification_roles_on_role_id"
   end
 
   create_table "notification_users", force: :cascade do |t|
@@ -351,6 +353,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_14_163152) do
   add_foreign_key "couriers", "locations"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users"
+  add_foreign_key "notification_roles", "notifications"
+  add_foreign_key "notification_roles", "roles"
   add_foreign_key "notification_users", "notifications"
   add_foreign_key "notification_users", "users"
   add_foreign_key "order_products", "orders"
