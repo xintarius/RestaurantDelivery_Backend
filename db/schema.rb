@@ -174,7 +174,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_15_004409) do
     t.string "sender"
     t.datetime "received_date"
     t.boolean "read", default: false
-    t.datetime "timestamp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "order_products", force: :cascade do |t|
