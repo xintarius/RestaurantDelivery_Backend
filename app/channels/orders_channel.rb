@@ -98,6 +98,7 @@ class OrdersChannel < ApplicationCable::Channel
       orders_data = orders_scope.map { |o| format_order_details(o, courier) }
       transmit({ type: "CURRENT_STATE", orders: orders_data })
       puts ">>>> ZAKOŃCZONO: Zamówienie #{order.id} zostało dostarczone!"
+      HistoryService.generate_history_order(order)
     end
   end
   def unsubscribed
@@ -132,12 +133,12 @@ class OrdersChannel < ApplicationCable::Channel
       order_id: order.id,
       order_number: order.order_number,
       order_status: order.order_status,
-      vendor_name: order.user.username,
-      vendor_street: user_address&.street,
-      vendor_building: user_address&.building,
-      vendor_apartment: user_address&.apartment,
-      vendor_postal_code: user_address&.postal_code,
-      vendor_city: user_address&.city,
+      client_name: order.user.username,
+      client_street: user_address&.street,
+      client_building: user_address&.building,
+      client_apartment: user_address&.apartment,
+      client_postal_code: user_address&.postal_code,
+      client_city: user_address&.city,
       gross_payment: payment&.gross_payment
     }
   end

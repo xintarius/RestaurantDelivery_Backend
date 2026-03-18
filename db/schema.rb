@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_15_004409) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_17_164914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -140,6 +140,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_15_004409) do
     t.index ["location_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
     t.index ["user_id"], name: "index_couriers_on_user_id"
+  end
+
+  create_table "history_orders", force: :cascade do |t|
+    t.string "restaurant_name"
+    t.string "pickup_address"
+    t.string "delivery_address"
+    t.integer "total_courier_earnings"
+    t.integer "base_earnings_data"
+    t.string "order_status"
+    t.bigint "order_id"
+    t.bigint "courier_id"
+    t.bigint "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_history_orders_on_courier_id"
+    t.index ["order_id"], name: "index_history_orders_on_order_id"
+    t.index ["vendor_id"], name: "index_history_orders_on_vendor_id"
   end
 
   create_table "locations", force: :cascade do |t|
