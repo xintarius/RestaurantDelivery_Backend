@@ -4,5 +4,6 @@ class Courier < ApplicationRecord
   has_many :courier_orders
   has_many :orders, through: :courier_orders
   has_many :courier_payments
+  has_many :support_tickets
   self.table_name = "couriers"
 end

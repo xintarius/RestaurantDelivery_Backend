@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_17_164914) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_19_131128) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -264,6 +264,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_17_164914) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "support_tickets", force: :cascade do |t|
+    t.string "subject"
+    t.string "message"
+    t.string "status", default: "OPEN"
+    t.bigint "courier_id"
+    t.bigint "user_id"
+    t.bigint "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_support_tickets_on_courier_id"
+    t.index ["user_id"], name: "index_support_tickets_on_user_id"
+    t.index ["vendor_id"], name: "index_support_tickets_on_vendor_id"
   end
 
   create_table "terminal_calendars", force: :cascade do |t|

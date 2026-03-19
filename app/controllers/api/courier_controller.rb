@@ -29,8 +29,6 @@ class Api::CourierController < ApplicationController
     render json: orders_data
   end
 
-
-
   private
 
   def current_courier
