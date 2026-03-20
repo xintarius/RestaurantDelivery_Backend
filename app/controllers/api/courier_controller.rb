@@ -28,10 +28,4 @@ class Api::CourierController < ApplicationController
 
     render json: orders_data
   end
-
-  private
-
-  def current_courier
-    Courier.find_by!(user_id: current_user.id)
-  end
 end

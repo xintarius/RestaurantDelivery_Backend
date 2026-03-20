@@ -49,7 +49,9 @@ Rails.application.routes.draw do
 
     get "get_notification", to: "notifications#get_notification"
 
-    get "support_tickets", to: "support_tickets#create_courier_ticket"
+    get "courier_ticket", to: "support_tickets#courier_ticket"
+    get "show_courier_ticket_details/:id", to: "support_tickets#show_courier_ticket_details"
+    post "create_courier_ticket", to: "support_tickets#create_courier_ticket"
 
     get "category_types", to: "category_types#category"
     get "category_types/:category_id/vendors", to: "category_types#find_category"
