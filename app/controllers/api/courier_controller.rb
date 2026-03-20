@@ -1,5 +1,5 @@
 # courier_controller
-class Api::CourierController < ApplicationController
+class Api::CourierController < Api::ApplicationController
 
   def courier_profile
     couriers_data = User.joins(:address, :courier)
