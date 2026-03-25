@@ -6,10 +6,10 @@ class CouriersChannel < ApplicationCable::Channel
     courier = current_user.courier
 
     courier_earnings = CourierPayment.where(courier_id: courier.id).sum(:gross_payment)
-
     transmit({
                type: "EARNINGS",
-               earnings: courier_earnings
+               earnings: courier_earnings,
+               current_balance: courier.current_balance
              })
   end
 

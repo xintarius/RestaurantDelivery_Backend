@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_19_131128) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_23_104045) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,6 +136,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_131128) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.string "courier_number"
+    t.integer "current_balance", default: 0
     t.index ["addresses_id"], name: "index_couriers_on_addresses_id"
     t.index ["location_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
@@ -354,6 +355,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_19_131128) do
     t.integer "category_type_id"
     t.index ["address_id"], name: "index_vendors_on_address_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
+  end
+
+  create_table "wallet_transactions", force: :cascade do |t|
+    t.bigint "courier_id"
+    t.integer "amount"
+    t.integer "transaction_type"
+    t.string "title"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_wallet_transactions_on_courier_id"
   end
 
   create_table "zones", force: :cascade do |t|

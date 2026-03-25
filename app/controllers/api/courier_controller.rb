@@ -21,6 +21,15 @@ class Api::CourierController < Api::ApplicationController
     render json: courier_order
   end
 
+  def courier_wallet
+    courier = current_user.courier
+
+    render json: {
+      courier_id: courier.id,
+      current_balance: courier.current_balance
+    }
+  end
+
   def history_data
     orders_data = HistoryOrder.where(courier_id: current_courier)
                               .select("id, restaurant_name, pickup_address, delivery_address,

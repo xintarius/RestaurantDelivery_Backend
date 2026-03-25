@@ -36,7 +36,7 @@ Rails.application.routes.draw do
     get "courier_interface", to: "courier#courier_interface"
     get "courier_profile", to: "courier#courier_profile"
     get "history_data", to: "courier#history_data"
-
+    get "courier_wallet", to: "courier#courier_wallet"
 
     post "create_product", to: "products#create_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
