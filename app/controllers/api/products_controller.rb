@@ -19,6 +19,29 @@ class Api::ProductsController < ApplicationController
     end
   end
 
+  def update_product
+    product = Product.find(params[:id])
+
+    if product.update(strong_params)
+      render json: { message: 'Produkt został pomyślnie zaktualizowany', product: product }, status: :ok
+    else
+      render json: { errors: product.errors.full_messages }, status: :unprocessable_entity
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Nie znaleziono produktu' }, status: :not_found
+  end
+
+  def delete_product
+    product = Product.find(params[:id])
+    product.destroy
+
+    render json: { message: 'Produkt został usunięty' }, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Nie znaleziono produktu' }, status: :not_found
+  end
+
+  private
+
   def strong_params
     params.require(:product).permit(:product_name, :description, :price_gross, :price_net)
   end

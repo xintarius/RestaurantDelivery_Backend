@@ -39,6 +39,8 @@ Rails.application.routes.draw do
     get "courier_wallet", to: "courier#courier_wallet"
 
     post "create_product", to: "products#create_product"
+    put "/update_product/:id", to: "products#update_product"
+    delete "delete_product/:id", to: "products#delete_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 
     get "cart_summary", to: "cart_summaries#cart_summary"
