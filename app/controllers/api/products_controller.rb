@@ -4,7 +4,7 @@ class Api::ProductsController < ApplicationController
 
   def get_products
     vendor = Vendor.where(user_id: current_user)
-    products = Product.where(vendor_id: vendor).select(:id, :product_name, :file_path, :description, :price_gross)
+    products = Product.where(vendor_id: vendor).where.not(availability_status: 'ARCHIVED').select(:id, :product_name, :file_path, :description, :price_gross, :availability_status)
     render json: products.as_json
   end
 
@@ -33,7 +33,7 @@ class Api::ProductsController < ApplicationController
 
   def delete_product
     product = Product.find(params[:id])
-    product.destroy
+    product.update(availability_status: 'ARCHIVED')
 
     render json: { message: 'Produkt został usunięty' }, status: :ok
   rescue ActiveRecord::RecordNotFound
@@ -43,6 +43,6 @@ class Api::ProductsController < ApplicationController
   private
 
   def strong_params
-    params.require(:product).permit(:product_name, :description, :price_gross, :price_net)
+    params.require(:product).permit(:product_name, :description, :price_gross, :price_net, :availability_status)
   end
 end
