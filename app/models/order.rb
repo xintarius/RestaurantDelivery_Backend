@@ -9,6 +9,7 @@ class Order < ApplicationRecord
   has_many :couriers, through: :courier_orders
   has_many :products, through: :order_products
   before_create :generate_order_number
+  after_create_commit :broadCast_to_vendor
   def products_list
     order_products.map do |op|
       {
@@ -21,6 +22,10 @@ class Order < ApplicationRecord
   end
 
   private
+
+  def broadcast_to_vendor
+    VendorOrdersJob.perform_later(self.id)
+  end
 
   def generate_order_number
     self.order_number ||= "ORD-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(3).upcase}"
