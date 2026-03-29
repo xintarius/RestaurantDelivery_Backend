@@ -33,6 +33,8 @@ class Api::CartSummariesController < ApplicationController
   def add_to_cart
     cart_summary = CartSummary.new(cart_summary_params)
 
+    cart_summary.user_id = current_user.id
+
     if cart_summary.save
       render json: cart_summary, include: :cart_products, status: :created
     else

@@ -9,7 +9,7 @@ class Order < ApplicationRecord
   has_many :couriers, through: :courier_orders
   has_many :products, through: :order_products
   before_create :generate_order_number
-  after_create_commit :broadCast_to_vendor
+  after_create_commit :broadcast_to_vendor
   def products_list
     order_products.map do |op|
       {
@@ -21,11 +21,27 @@ class Order < ApplicationRecord
     end
   end
 
-  private
+  def product_name
+    order_products.includes(:product).map do |op|
+      "#{op.quantity}x #{op.product.product_name}"
+    end.join(", ")
+  end
+
+  def total_price
+    order_products.sum(:total_price).to_f
+  end
 
   def broadcast_to_vendor
-    VendorOrdersJob.perform_later(self.id)
+    ActionCable.server.broadcast(
+      "vendors_channel_#{self.vendor_id}",
+      self.as_json(
+        only: [ :id, :order_status, :order_number, :order_note_vendor, :estimated_ready_from_vendor ],
+        methods: [ :product_name, :total_price ]
+      )
+    )
   end
+
+  private
 
   def generate_order_number
     self.order_number ||= "ORD-#{Time.current.strftime('%Y%m%d')}-#{SecureRandom.hex(3).upcase}"

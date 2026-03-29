@@ -2,19 +2,29 @@
 class Api::OrdersController < ApplicationController
   before_action :authenticate_user!
   def vendor_orders
-    orders = Order.includes(:order_products, :products)
+    per_page = params.fetch(:per_page, 10).to_i
+    page = params.fetch(:page, 1).to_i
+    orders = Order.limit(per_page).offset((page - 1) * per_page)
+                  .includes(:order_products, :products)
                   .where(vendor_id: current_vendor)
+                  .where.not(order_status: "delivered")
 
-    render json: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor ], methods: [:products_list])
+    render json: { data: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor ],
+                   methods: [ :product_name, :total_price ]),
+                   meta: {
+                     current_page: page,
+                     per_page: per_page
+                   } }
   end
 
   def create_order_from_cart
-    cart = CartSummary.find_by!(user_id: current_user, order_id: nil)
+    cart = CartSummary.find_by!(user_id: current_user.id, order_id: nil)
     if cart.nil? || cart.cart_products.empty?
       return render json: { error: "Koszyk jest pusty" }, status: :not_found
     end
     order = PaymentService.pay_for_order(current_user, cart)
     cart.update!(order_id: order.id)
+    order.broadcast_to_vendor
     search_for_courier(order)
     render_respond(order)
   rescue ActiveRecord::RecordInvalid => e
