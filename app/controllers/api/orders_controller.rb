@@ -8,13 +8,49 @@ class Api::OrdersController < ApplicationController
                   .includes(:order_products, :products)
                   .where(vendor_id: current_vendor)
                   .where.not(order_status: "delivered")
+                  .where.not(order_status: "rejected")
 
-    render json: { data: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor ],
+    render json: { data: orders.as_json(only: [ :id, :order_status, :order_number, :order_note_vendor, :estimated_delivery_time ],
                    methods: [ :product_name, :total_price ]),
                    meta: {
                      current_page: page,
                      per_page: per_page
                    } }
+  end
+
+  def accept
+    order = Order.find_by(id: params[:id], vendor_id: current_vendor)
+
+    render json: { error: "Nie odnaleziono zamówienia" }, status: :not_found unless order
+
+    minutes = params[:delivery_time_minutes].to_i
+
+    if order.update(
+      order_status: "accepted",
+      estimated_delivery_time: Time.current + minutes.minutes
+    )
+    order.broadcast_to_vendor
+    render json: { message: "Zamówienie zaakceptowane" }, status: :ok
+    else
+    render json: { error: order.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def reject
+    order = Order.find_by(id: params[:id], vendor_id: current_vendor)
+
+    render json: { error: "nie odnaleziono zamówienia" }, status: :not_found unless order
+
+    if order.update(
+      order_status: "rejected",
+      reject_reason: params[:reject_reason]
+    )
+      order.broadcast_to_vendor
+
+      render json: { message: "Zamówienie odrzucone" }, status: :ok
+    else
+      render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def create_order_from_cart
@@ -29,6 +65,17 @@ class Api::OrdersController < ApplicationController
     render_respond(order)
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  def ready
+    order = Order.find_by(id: params[:id], vendor_id: current_vendor)
+
+    if order.update(order_status: "ready")
+      order.broadcast_to_vendor
+      render json: { message: "Zamówienie gotowe do odbioru" }, status: :ok
+    else
+      render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def active_client_orders

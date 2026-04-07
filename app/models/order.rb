@@ -35,7 +35,7 @@ class Order < ApplicationRecord
     ActionCable.server.broadcast(
       "vendors_channel_#{self.vendor_id}",
       self.as_json(
-        only: [ :id, :order_status, :order_number, :order_note_vendor, :estimated_ready_from_vendor ],
+        only: [ :id, :order_status, :order_number, :order_note_vendor, :estimated_delivery_time ],
         methods: [ :product_name, :total_price ]
       )
     )

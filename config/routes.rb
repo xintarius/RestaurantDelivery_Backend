@@ -22,6 +22,9 @@ Rails.application.routes.draw do
     get "profile", to: "users#profile"
 
     get "vendor_orders", to: "orders#vendor_orders"
+    put "accept/:id", to: "orders#accept"
+    put "reject/:id", to: "orders#reject"
+    put "ready/:id", to: "orders#ready"
     get "client_menu/:vendor_id", to: "orders#client_menu"
     post "create_order_from_cart", to: "orders#create_order_from_cart"
 
