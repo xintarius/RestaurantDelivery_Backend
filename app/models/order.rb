@@ -28,7 +28,7 @@ class Order < ApplicationRecord
   end
 
   def total_price
-    order_products.sum(:total_price).to_f
+    order_products.to_a.sum(&:total_price).to_f
   end
 
   def broadcast_to_vendor
