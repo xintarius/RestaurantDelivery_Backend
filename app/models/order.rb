@@ -22,7 +22,7 @@ class Order < ApplicationRecord
   end
 
   def product_name
-    order_products.includes(:product).map do |op|
+    order_products.map do |op|
       "#{op.quantity}x #{op.product.product_name}"
     end.join(", ")
   end
