@@ -4,36 +4,54 @@ class Api::CartSummariesController < ApplicationController
   def cart_summary
     per_page = params.fetch(:per_page, 8).to_i
     page = params.fetch(:page, 1).to_i
-    per_user = CartSummary.where(user_id: current_user.id, order_id: nil)
-    cart_summaries = CartSummary.limit(per_page).offset((page - 1) * per_page)
-                                .joins(:cart_products)
-                                .where(user_id: current_user, order_id: nil)
-                                .select("cart_products.quantity as quantity,
-                                cart_products.unit_price as price,
-                                cart_products.total_price as total_price, cart_products.id as id,
-                                gross_payment, net_payment")
 
-    render json: { data: cart_summaries.as_json,
+    active_summaries = CartSummary.includes(:cart_products)
+                                  .where(user_id: current_user.id, order_id: nil)
+                                  .limit(per_page)
+                                  .offset((page - 1) * per_page)
+    formatted_data = active_summaries.map do |summary|
+      {
+        cart_summary_id: summary.id,
+        vendor_id: summary.vendor_id,
+        gross_payment: summary.gross_payment,
+        products: summary.cart_products.map do |cp|
+          {
+            cart_product_id: cp.id,
+            product_id: cp.product_id,
+            product_name: cp.product.product_name,
+            quantity: cp.quantity,
+            unit_price: cp.unit_price,
+            total_price: cp.total_price
+          }
+        end
+      }
+    end
+    render json: { data: formatted_data,
                    meta: {
                      current_page: page,
-                     per_page: per_page,
-                     total_records: per_user.count,
-                     total_pages: (per_user.count / per_page .to_f).ceil
+                     total_records: CartSummary.where(user_id: current_user.id, order_id: nil).count
                    }
     }
   end
 
   def get_cart_sum
-    sum_cart = CartSummary.where(user_id: current_user)
-    cart_product = CartProduct.where(cart_summary_id: sum_cart).sum(:total_price).to_f.round(2)
+    selected_ids = params[:selected_ids] || []
 
-    render json: { total: sprintf("%.2f", cart_product) }
+    return render json: { total: "0.00" } if selected_ids.empty?
+    total = CartProduct.joins(:cart_summary)
+                       .where(id: selected_ids, cart_summaries: { user_id: current_user.id, order_id: nil })
+                       .sum(:total_price)
+
+    render json: { total: sprintf("%.2f", total) }
   end
 
   def add_to_cart
-    cart_summary = CartSummary.new(cart_summary_params)
-
-    cart_summary.user_id = current_user.id
+    cart_summary = CartSummary.find_or_initialize_by(
+      user_id: current_user.id,
+      vendor_id: params[:cart_summary][:vendor_id],
+      order_id: nil
+    )
+    cart_summary.assign_attributes(cart_summary_params.expect(:vendor_id))
 
     if cart_summary.save
       render json: cart_summary, include: :cart_products, status: :created
