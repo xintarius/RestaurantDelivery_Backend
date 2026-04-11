@@ -13,6 +13,7 @@ class Api::CartSummariesController < ApplicationController
       {
         cart_summary_id: summary.id,
         vendor_id: summary.vendor_id,
+        vendor_name: summary.vendor.name,
         gross_payment: summary.gross_payment,
         products: summary.cart_products.map do |cp|
           {
@@ -51,7 +52,15 @@ class Api::CartSummariesController < ApplicationController
       vendor_id: params[:cart_summary][:vendor_id],
       order_id: nil
     )
-    cart_summary.assign_attributes(cart_summary_params.expect(:vendor_id))
+
+    new_gross = cart_summary_params[:gross_payment].to_f
+    new_net = cart_summary_params[:net_payment].to_f
+    cart_summary.gross_payment = (cart_summary.gross_payment || 0.0) + new_gross
+    cart_summary.net_payment = (cart_summary.net_payment || 0.0) + new_net
+
+    cart_summary.assign_attributes(
+      cart_products_attributes: cart_summary_params[:cart_products_attributes]
+    )
 
     if cart_summary.save
       render json: cart_summary, include: :cart_products, status: :created
