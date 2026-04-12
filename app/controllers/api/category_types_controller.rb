@@ -2,8 +2,14 @@
 class Api::CategoryTypesController < ApplicationController
 
   def category
-    categories = CategoryType.includes(:vendors).select(:id, "category_name as name")
-    render json: categories.as_json(include: :vendors)
+    categories = CategoryType.all
+    formatted_categories = categories.map do |cat|
+      {
+        id: cat.id,
+        category_name: cat.category_name
+      }
+    end
+    render json: formatted_categories, status: :ok
   end
 
   def find_category
