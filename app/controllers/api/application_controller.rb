@@ -27,4 +27,8 @@ class Api::ApplicationController < ActionController::API
     @current_courier ||= Courier.find_by!(user_id: @current_user.id)
   end
 
+  def current_vendor
+    Vendor.find_by!(user_id: current_user.id)
+  end
+
 end

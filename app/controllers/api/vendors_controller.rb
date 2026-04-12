@@ -1,5 +1,5 @@
 # vendor controller
-class Api::VendorsController < ApplicationController
+class Api::VendorsController < Api::ApplicationController
   before_action :authenticate_user!
   def vendors
     per_page = params.fetch(:per_page, 12).to_i

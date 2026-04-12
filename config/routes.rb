@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     # vendor routes
     get "vendors", to: "vendors#vendors"
     get "get_products", to: "products#get_products"
+    get "statistics", to: "statistics#statistics"
 
     # courier routes
     get "courier_interface", to: "courier#courier_interface"
