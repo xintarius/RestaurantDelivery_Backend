@@ -54,15 +54,24 @@ class Api::OrdersController < ApplicationController
   end
 
   def create_order_from_cart
-    cart = CartSummary.find_by!(user_id: current_user.id, order_id: nil)
-    if cart.nil? || cart.cart_products.empty?
-      return render json: { error: "Koszyk jest pusty" }, status: :not_found
+    selected_order_ids = params[:selected_cart_product_ids]
+
+    return render json: { error: "Nie wybrano żadnych produktów" }, status: :bad_request if selected_order_ids.blank?
+
+    cart_products = CartProduct.includes(:cart_summary)
+                               .where(id: selected_order_ids, cart_summaries: { user_id: current_user.id, order_id: nil })
+    return render json: { error: "Koszyk jest pusty" }, status: :not_found if cart_products.empty?
+
+    created_orders = []
+
+    grouped_products = cart_products.group_by(&:cart_summary)
+    grouped_products.each do |cart, products|
+      order = PaymentService.pay_for_order(current_user, cart, products)
+      order.broadcast_to_vendor
+      search_for_courier(order)
+      created_orders << order
     end
-    order = PaymentService.pay_for_order(current_user, cart)
-    cart.update!(order_id: order.id)
-    order.broadcast_to_vendor
-    search_for_courier(order)
-    render_respond(order)
+    render_respond(created_orders)
   rescue ActiveRecord::RecordInvalid => e
     render json: { error: e.message }, status: :unprocessable_entity
   end
@@ -108,15 +117,18 @@ class Api::OrdersController < ApplicationController
     end
   end
 
-  def render_respond(order)
-    render json: order.as_json(
-      include: {
-        order_products: {
-          include: { product: { only: [ :product_name, :price_gross ] } },
-          only: [ :quantity ]
+  def render_respond(orders)
+    render json: {
+      message: "Zamówienie złożone pomyślnie",
+      orders: orders.as_json(
+        include: {
+          order_products: {
+            include: { product: { only: [ :product_name, :price_gross ] } },
+            only: [ :quantity ]
+          }
         }
-      }
-    ), status: :created
+      )
+    }, status: :created
   end
 
   def order_params
