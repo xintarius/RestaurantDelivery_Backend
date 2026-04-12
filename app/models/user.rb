@@ -6,13 +6,14 @@ class User < ApplicationRecord
          jwt_revocation_strategy: Devise::JWT::RevocationStrategies::Null
 
   belongs_to :role
+  has_one :courier, dependent: :destroy
+  has_one :address, dependent: :destroy
   has_many :vendors
   has_many :orders
   has_many :cart_summaries
-  has_one :courier, dependent: :destroy
   has_many :notification_users
   has_many :notifications, through: :notification_users
-  has_one :address, dependent: :destroy
+  has_many :support_tickets
   before_validation :set_default_role, on: :create
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_01_151030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,8 +59,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.decimal "vat"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "vendor_id"
     t.index ["order_id"], name: "index_cart_summaries_on_order_id"
     t.index ["user_id"], name: "index_cart_summaries_on_user_id"
+  end
+
+  create_table "category_types", force: :cascade do |t|
+    t.string "category_name"
+    t.string "category_code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "courier_orders", force: :cascade do |t|
@@ -117,9 +126,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
   end
 
   create_table "couriers", force: :cascade do |t|
-    t.bigint "users_id"
     t.bigint "addresses_id"
-    t.bigint "locations_id"
+    t.bigint "location_id"
     t.bigint "roles_id"
     t.string "courier_status", default: "Offline"
     t.string "courier_code"
@@ -127,11 +135,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.string "courier_number"
+    t.integer "current_balance", default: 0
     t.index ["addresses_id"], name: "index_couriers_on_addresses_id"
-    t.index ["locations_id"], name: "index_couriers_on_locations_id"
+    t.index ["location_id"], name: "index_couriers_on_locations_id"
     t.index ["roles_id"], name: "index_couriers_on_roles_id"
     t.index ["user_id"], name: "index_couriers_on_user_id"
-    t.index ["users_id"], name: "index_couriers_on_users_id"
+  end
+
+  create_table "history_orders", force: :cascade do |t|
+    t.string "restaurant_name"
+    t.string "pickup_address"
+    t.string "delivery_address"
+    t.integer "total_courier_earnings"
+    t.integer "base_earnings_data"
+    t.string "order_status"
+    t.bigint "order_id"
+    t.bigint "courier_id"
+    t.bigint "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_history_orders_on_courier_id"
+    t.index ["order_id"], name: "index_history_orders_on_order_id"
+    t.index ["vendor_id"], name: "index_history_orders_on_vendor_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -140,6 +166,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "latitude"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "notification_roles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "notification_id", null: false
+    t.bigint "role_id", null: false
+    t.index ["notification_id"], name: "index_notification_roles_on_notification_id"
+    t.index ["role_id"], name: "index_notification_roles_on_role_id"
   end
 
   create_table "notification_users", force: :cascade do |t|
@@ -157,6 +192,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "sender"
     t.datetime "received_date"
     t.boolean "read", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "order_products", force: :cascade do |t|
@@ -181,6 +218,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "payment_status", default: "unpaid"
+    t.string "reject_reason"
+    t.datetime "estimated_delivery_time"
     t.index ["user_id"], name: "index_orders_on_user_id"
     t.index ["vendor_id"], name: "index_orders_on_vendor_id"
   end
@@ -195,6 +234,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.datetime "updated_at", null: false
     t.string "file_path"
     t.string "description"
+    t.string "availability_status", default: "inactive"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end
 
@@ -228,6 +268,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "support_tickets", force: :cascade do |t|
+    t.string "subject"
+    t.string "message"
+    t.string "status", default: "OPEN"
+    t.bigint "courier_id"
+    t.bigint "user_id"
+    t.bigint "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_support_tickets_on_courier_id"
+    t.index ["user_id"], name: "index_support_tickets_on_user_id"
+    t.index ["vendor_id"], name: "index_support_tickets_on_vendor_id"
   end
 
   create_table "terminal_calendars", force: :cascade do |t|
@@ -271,6 +325,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "phone_number"
     t.string "stripe_customer_id"
     t.string "stripe_payment_method_id"
+    t.string "name"
+    t.string "last_name"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role_id"], name: "index_users_on_role_id"
@@ -299,8 +355,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
     t.string "description"
     t.string "nip"
     t.boolean "activated_in_system", default: false
+    t.integer "category_type_id"
     t.index ["address_id"], name: "index_vendors_on_address_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
+  end
+
+  create_table "wallet_transactions", force: :cascade do |t|
+    t.bigint "courier_id"
+    t.integer "amount"
+    t.integer "transaction_type"
+    t.string "title"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["courier_id"], name: "index_wallet_transactions_on_courier_id"
+  end
+
+  create_table "zones", force: :cascade do |t|
+    t.bigint "location_id", null: false
+    t.string "name"
+    t.jsonb "polygon_path", default: []
+    t.boolean "active", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_zones_on_location_id"
   end
 
   add_foreign_key "addresses", "locations"
@@ -320,10 +398,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
   add_foreign_key "courier_traces", "orders"
   add_foreign_key "courier_traces", "vendors"
   add_foreign_key "couriers", "addresses", column: "addresses_id"
-  add_foreign_key "couriers", "locations", column: "locations_id"
+  add_foreign_key "couriers", "locations"
   add_foreign_key "couriers", "roles", column: "roles_id"
   add_foreign_key "couriers", "users"
-  add_foreign_key "couriers", "users", column: "users_id"
+  add_foreign_key "notification_roles", "notifications"
+  add_foreign_key "notification_roles", "roles"
   add_foreign_key "notification_users", "notifications"
   add_foreign_key "notification_users", "users"
   add_foreign_key "order_products", "orders"
@@ -343,4 +422,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_132111) do
   add_foreign_key "vendor_payments", "vendors"
   add_foreign_key "vendors", "addresses"
   add_foreign_key "vendors", "users"
+  add_foreign_key "zones", "locations"
 end

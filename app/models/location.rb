@@ -2,4 +2,5 @@
 class Location < ApplicationRecord
   has_many :vendors
   has_many :addresses
+  has_many :zones
 end

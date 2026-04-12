@@ -21,19 +21,29 @@ Rails.application.routes.draw do
 
     get "profile", to: "users#profile"
 
-    get "orders", to: "orders#order_index"
-    get "client_menu", to: "orders#client_menu"
+    get "vendor_orders", to: "orders#vendor_orders"
+    put "accept/:id", to: "orders#accept"
+    put "reject/:id", to: "orders#reject"
+    put "ready/:id", to: "orders#ready"
+    get "client_menu/:vendor_id", to: "orders#client_menu"
     post "create_order_from_cart", to: "orders#create_order_from_cart"
 
     get "active_client_orders", to: "orders#active_client_orders"
     get "finished_client_orders", to: "orders#finished_client_orders"
 
+    # vendor routes
     get "vendors", to: "vendors#vendors"
-
-    get "courier_interface", to: "courier#courier_interface"
-
     get "get_products", to: "products#get_products"
+
+    # courier routes
+    get "courier_interface", to: "courier#courier_interface"
+    get "courier_profile", to: "courier#courier_profile"
+    get "history_data", to: "courier#history_data"
+    get "courier_wallet", to: "courier#courier_wallet"
+
     post "create_product", to: "products#create_product"
+    put "/update_product/:id", to: "products#update_product"
+    delete "delete_product/:id", to: "products#delete_product"
     post "add_to_cart", to: "cart_summaries#add_to_cart"
 
     get "cart_summary", to: "cart_summaries#cart_summary"
@@ -42,11 +52,20 @@ Rails.application.routes.draw do
 
     get "get_address", to: "addresses#get_address"
 
+    get "get_notification", to: "notifications#get_notification"
+
+    get "courier_ticket", to: "support_tickets#courier_ticket"
+    get "show_courier_ticket_details/:id", to: "support_tickets#show_courier_ticket_details"
+    post "create_courier_ticket", to: "support_tickets#create_courier_ticket"
+
+    get "category_types", to: "category_types#category"
+    get "category_types/:category_id/vendors", to: "category_types#find_category"
+    delete "cart_products/:id", to: "cart_summaries#cart_products"
     namespace :v1 do
     get "earnings/courier/:id", to: "billing#earnings"
     end
   end
 
-  mount ActionCable.server => '/cable'
+  mount ActionCable.server => "/cable"
 end
 

@@ -23,4 +23,8 @@ class Api::ApplicationController < ActionController::API
     render json: { error: "Invalid token" }, status: :unauthorized
   end
 
+  def current_courier
+    @current_courier ||= Courier.find_by!(user_id: @current_user.id)
+  end
+
 end
