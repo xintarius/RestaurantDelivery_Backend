@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_01_151030) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_16_101426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -356,6 +356,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_01_151030) do
     t.string "nip"
     t.boolean "activated_in_system", default: false
     t.integer "category_type_id"
+    t.datetime "paused_until"
+    t.integer "max_active_orders"
     t.index ["address_id"], name: "index_vendors_on_address_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
   end
