@@ -5,12 +5,10 @@ on:
     branches:
       - master
       - develop
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: development
     permissions:
       contents: read
       packages: write
@@ -33,12 +31,8 @@ jobs:
           tags: ghcr.io/xintarius/restaurantdelivery_backend:develop
 
   deploy:
-    needs: build
-    if: github.event_name == 'workflow_dispatch'
-    environment:
-      name: development
     runs-on: ubuntu-latest
-
+    environment: development
     steps:
       - name: Execute remote SSH commands
         uses: appleboy/ssh-action@v1.0.3

@@ -5,10 +5,9 @@ services:
     image: ghcr.io/xintarius/restaurantdelivery_backend:develop
     container_name: restaurantdelivery_backend_web
     ports:
-      - "3001:3001"
+      - "3001:3000"
     environment:
       - RAILS_ENV=development
-      - DATABASE_URL=postgresql://postgres:password@db:5432/restaurantdelivery_backend_development
       - REDIS_URL=redis://redis:6379/1
     depends_on:
       - db
