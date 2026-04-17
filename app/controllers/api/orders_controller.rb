@@ -1,5 +1,5 @@
 # orders controller
-class Api::OrdersController < ApplicationController
+class Api::OrdersController < Api::ApplicationController
   before_action :authenticate_user!
   def vendor_orders
     per_page = params.fetch(:per_page, 10).to_i
@@ -106,9 +106,6 @@ class Api::OrdersController < ApplicationController
 
   private
 
-  def current_vendor
-    Vendor.find_by!(user_id: current_user.id)
-  end
   def search_for_courier(order)
     courier = Courier.find(1)
 

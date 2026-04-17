@@ -34,6 +34,9 @@ Rails.application.routes.draw do
     # vendor routes
     get "vendors", to: "vendors#vendors"
     get "get_products", to: "products#get_products"
+    get "limitations", to: "limitations#index"
+    get "statistics", to: "statistics#statistics"
+    post "limitations", to: "limitations#set_limit"
 
     # courier routes
     get "courier_interface", to: "courier#courier_interface"
