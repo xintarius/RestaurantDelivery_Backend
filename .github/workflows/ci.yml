@@ -2,12 +2,15 @@ name: restaurant delivery backend development
 
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - master
+      - develop
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: development
     permissions:
       contents: read
       packages: write
@@ -31,7 +34,8 @@ jobs:
 
   deploy:
     needs: build
-    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: development
     runs-on: ubuntu-latest
 
     steps:
@@ -44,6 +48,6 @@ jobs:
           script: |
             cd RestaurantDelivery_Backend
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose pull
+            docker compose pull -q
             docker compose up -d
-            docker compose exec -T rails_app bundle exec rails db:migrate
+            docker exec restaurantdelivery_backend_web bundle exec rails db:migrate
