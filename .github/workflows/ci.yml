@@ -9,6 +9,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      RD_DATABASE_NAME: ${{ secrets.RD_DATABASE_NAME}}
+      RD_DATABASE_USERNAME: ${{ secrets.RD_DATABASE_USERNAME }}
+      RD_DATABASE_PASSWORD: ${{ secrets.RD_DATABASE_PASSWORD }}
+      RD_DATABASE_HOST: ${{ secrets.RD_DATABASE_HOST }}
+
     permissions:
       contents: read
       packages: write
@@ -42,7 +49,10 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
             cd RestaurantDelivery_Backend
+            git fetch origin develop
+            git reset --hard origin/develop
+            docker-compose down --remove-orphans
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull -q
             docker compose up -d
-            docker exec restaurantdelivery_backend_web bundle exec rails db:migrate
+            docker image prune -f

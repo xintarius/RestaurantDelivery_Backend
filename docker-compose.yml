@@ -5,23 +5,15 @@ services:
     image: ghcr.io/xintarius/restaurantdelivery_backend:develop
     container_name: restaurantdelivery_backend_web
     ports:
-      - "3001:3000"
+      - "3001:3001"
+    command: bundle exec rails s -p 3001 -b 0.0.0.0
     environment:
       - RAILS_ENV=development
       - REDIS_URL=redis://redis:6379/1
+    env_file:
+      - .env
     depends_on:
-      - db
       - redis
-    networks:
-      - app-network
-
-  db:
-    image: postgres:15-alpine
-    container_name: restaurantdelivery_backend_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=password
     networks:
       - app-network
 
@@ -29,8 +21,12 @@ services:
     image: ghcr.io/xintarius/restaurantdelivery_backend:develop
     container_name: restaurantdelivery_backend_sidekiq
     command: bundle exec sidekiq
+    environment:
+      - RAILS_ENV=development
+      - REDIS_URL=redis://redis:6379/1
+    env_file:
+      - .env
     depends_on:
-      - db
       - redis
     networks:
       - app-network
@@ -48,5 +44,4 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
   redis_data:
