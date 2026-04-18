@@ -37,6 +37,10 @@ Rails.application.routes.draw do
     get "limitations", to: "limitations#index"
     get "statistics", to: "statistics#statistics"
     post "limitations", to: "limitations#set_limit"
+    get "vendors/show_availablity", to: "vendors#show_availability"
+    post "vendors/update_status", to: "vendors#update_status"
+    post "vendors/update_standard_hours", to: "vendors#update_standard_hours"
+    post "vendors/sync_exceptions", to: "vendors#sync_exceptions"
 
     # courier routes
     get "courier_interface", to: "courier#courier_interface"

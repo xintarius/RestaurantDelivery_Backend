@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_16_101426) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_18_141939) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -332,6 +332,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_16_101426) do
     t.index ["role_id"], name: "index_users_on_role_id"
   end
 
+  create_table "vendor_exceptions", force: :cascade do |t|
+    t.bigint "vendor_id", null: false
+    t.date "special_date", null: false
+    t.string "exception_type"
+    t.string "open_time"
+    t.string "close_time"
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["vendor_id"], name: "index_vendor_exceptions_on_vendor_id"
+  end
+
   create_table "vendor_payments", force: :cascade do |t|
     t.bigint "vendor_id"
     t.bigint "order_id"
@@ -358,6 +370,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_16_101426) do
     t.integer "category_type_id"
     t.datetime "paused_until"
     t.integer "max_active_orders"
+    t.boolean "is_active", default: false
+    t.string "std_open", default: "09:00"
+    t.string "std_close", default: "21:00"
     t.index ["address_id"], name: "index_vendors_on_address_id"
     t.index ["user_id"], name: "index_vendors_on_user_id"
   end
@@ -420,6 +435,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_16_101426) do
   add_foreign_key "terminal_calendars", "terminals"
   add_foreign_key "user_payments", "users"
   add_foreign_key "users", "roles"
+  add_foreign_key "vendor_exceptions", "vendors"
   add_foreign_key "vendor_payments", "orders"
   add_foreign_key "vendor_payments", "vendors"
   add_foreign_key "vendors", "addresses"
